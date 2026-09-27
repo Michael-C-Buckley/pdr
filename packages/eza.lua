@@ -20,6 +20,9 @@ return {
             packages = { "eza" },
             features = { "git", "vendored-libgit2" },
             no_default_features = true,
+            environment = {
+                LIBZ_SYS_STATIC = "1",
+            },
         },
     },
     outputs = {
@@ -47,6 +50,7 @@ return {
                 ["aarch64-macos"] = "bbf179f2611c904014431740b559e8055276c12fcf978a7e31c271663548337f",
                 ["x86_64-linux"] = "bbf179f2611c904014431740b559e8055276c12fcf978a7e31c271663548337f",
             },
+            revision = 2,
         },
     },
 }
