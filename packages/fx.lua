@@ -1,0 +1,51 @@
+return {
+    name = "fx",
+    description = "View and process JSON in the terminal",
+    homepage = "https://fx.wtf/",
+    recipe_maintainers = { "tale" },
+    default_license = "MIT",
+    upstream = {
+        github = "antonmedv/fx",
+        repository_id = 118945118,
+        tag = "{version}",
+    },
+    source = {
+        url = "https://codeload.github.com/antonmedv/fx/tar.gz/refs/tags/{tag}",
+        archive = "tar.gz",
+        strip_prefix = "fx-{version}",
+    },
+    build = {
+        backend = "go",
+        go = {
+            binaries = {
+                fx = ".",
+            },
+        },
+    },
+    outputs = {
+        bins = { "fx" },
+        checks = {
+            { "fx", "--version" },
+        },
+    },
+    platforms = {
+        ["aarch64-linux"] = {
+            default_version = "39.2.0",
+        },
+        ["aarch64-macos"] = {
+            default_version = "39.2.0",
+        },
+        ["x86_64-linux"] = {
+            default_version = "39.2.0",
+        },
+    },
+    versions = {
+        ["39.2.0"] = {
+            digests = {
+                ["aarch64-linux"] = "cdb98177f956615c961bc615fab0b30e73167295152d4f2d4cb70b16cdf47d6e",
+                ["aarch64-macos"] = "cdb98177f956615c961bc615fab0b30e73167295152d4f2d4cb70b16cdf47d6e",
+                ["x86_64-linux"] = "cdb98177f956615c961bc615fab0b30e73167295152d4f2d4cb70b16cdf47d6e",
+            },
+        },
+    },
+}
