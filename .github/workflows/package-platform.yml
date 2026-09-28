@@ -30,7 +30,15 @@ jobs:
       contents: read
       actions: read
     outputs:
-      matrix: ${{ steps.plan.outputs.matrix }}
+      level_0: ${{ steps.plan.outputs.level_0 }}
+      level_1: ${{ steps.plan.outputs.level_1 }}
+      level_2: ${{ steps.plan.outputs.level_2 }}
+      level_3: ${{ steps.plan.outputs.level_3 }}
+      level_4: ${{ steps.plan.outputs.level_4 }}
+      level_5: ${{ steps.plan.outputs.level_5 }}
+      level_6: ${{ steps.plan.outputs.level_6 }}
+      level_7: ${{ steps.plan.outputs.level_7 }}
+      depth: ${{ steps.plan.outputs.depth }}
       has-work: ${{ steps.plan.outputs.has-work }}
       context: ${{ steps.tools.outputs.context }}
     steps:
@@ -77,21 +85,23 @@ jobs:
           path: discovery-records/*.json
           if-no-files-found: ignore
 
-  package:
+  # Builds run in dependency levels: each level installs the builds earlier levels made in this
+  # run instead of compiling them again. Empty levels are skipped.
+  level-0:
     name: ${{ matrix.package }} (${{ matrix.system }})
     needs: plan
     if: needs.plan.outputs.has-work == 'true'
     strategy:
       fail-fast: false
-      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
+      matrix: ${{ fromJSON(needs.plan.outputs.level_0) }}
     uses: ./.github/workflows/package-job.yml
-    secrets:
+    secrets: &secrets
       PDR_SIGNING_KEY: ${{ inputs.publish && secrets.PDR_SIGNING_KEY || '' }}
-    permissions:
+    permissions: &permissions
       contents: read
       actions: read
       packages: write
-    with:
+    with: &package
       runner: ${{ inputs.runner }}
       package: ${{ matrix.package }}
       name: ${{ matrix.name }}
@@ -101,4 +111,89 @@ jobs:
       artifact: ${{ matrix.artifact || '' }}
       reuse-run: ${{ matrix.reuse_run || inputs.reuse-run }}
       pdr-root: ${{ matrix.pdr_root || '' }}
+      dependencies: ${{ matrix.dependencies || '' }}
       publish: ${{ inputs.publish }}
+
+  level-1:
+    name: ${{ matrix.package }} (${{ matrix.system }})
+    needs: [plan, level-0]
+    if: ${{ !cancelled() && needs.plan.result == 'success' && fromJSON(needs.plan.outputs.depth) > 1 }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.level_1) }}
+    uses: ./.github/workflows/package-job.yml
+    secrets: *secrets
+    permissions: *permissions
+    with: *package
+
+  level-2:
+    name: ${{ matrix.package }} (${{ matrix.system }})
+    needs: [plan, level-1]
+    if: ${{ !cancelled() && needs.plan.result == 'success' && fromJSON(needs.plan.outputs.depth) > 2 }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.level_2) }}
+    uses: ./.github/workflows/package-job.yml
+    secrets: *secrets
+    permissions: *permissions
+    with: *package
+
+  level-3:
+    name: ${{ matrix.package }} (${{ matrix.system }})
+    needs: [plan, level-2]
+    if: ${{ !cancelled() && needs.plan.result == 'success' && fromJSON(needs.plan.outputs.depth) > 3 }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.level_3) }}
+    uses: ./.github/workflows/package-job.yml
+    secrets: *secrets
+    permissions: *permissions
+    with: *package
+
+  level-4:
+    name: ${{ matrix.package }} (${{ matrix.system }})
+    needs: [plan, level-3]
+    if: ${{ !cancelled() && needs.plan.result == 'success' && fromJSON(needs.plan.outputs.depth) > 4 }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.level_4) }}
+    uses: ./.github/workflows/package-job.yml
+    secrets: *secrets
+    permissions: *permissions
+    with: *package
+
+  level-5:
+    name: ${{ matrix.package }} (${{ matrix.system }})
+    needs: [plan, level-4]
+    if: ${{ !cancelled() && needs.plan.result == 'success' && fromJSON(needs.plan.outputs.depth) > 5 }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.level_5) }}
+    uses: ./.github/workflows/package-job.yml
+    secrets: *secrets
+    permissions: *permissions
+    with: *package
+
+  level-6:
+    name: ${{ matrix.package }} (${{ matrix.system }})
+    needs: [plan, level-5]
+    if: ${{ !cancelled() && needs.plan.result == 'success' && fromJSON(needs.plan.outputs.depth) > 6 }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.level_6) }}
+    uses: ./.github/workflows/package-job.yml
+    secrets: *secrets
+    permissions: *permissions
+    with: *package
+
+  level-7:
+    name: ${{ matrix.package }} (${{ matrix.system }})
+    needs: [plan, level-6]
+    if: ${{ !cancelled() && needs.plan.result == 'success' && fromJSON(needs.plan.outputs.depth) > 7 }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.plan.outputs.level_7) }}
+    uses: ./.github/workflows/package-job.yml
+    secrets: *secrets
+    permissions: *permissions
+    with: *package

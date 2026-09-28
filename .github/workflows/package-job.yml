@@ -37,6 +37,10 @@ on:
         description: The PDR root whose published dependencies the planned key names
         type: string
         default: ""
+      dependencies:
+        description: Input keys of dependency builds from earlier jobs of this run, installed instead of compiled
+        type: string
+        default: ""
 
 permissions:
   contents: read
@@ -106,6 +110,19 @@ jobs:
           name: published-records-reuse-${{ steps.reuse.outputs.key }}-${{ github.run_attempt }}
           path: discovery-records/*.json
           if-no-files-found: ignore
+      - name: Find dependency builds from this run
+        if: steps.reuse.outputs.has-work == 'true' && inputs.artifact == '' && inputs.dependencies != ''
+        id: dependencies
+        env:
+          DEPENDENCIES: ${{ inputs.dependencies }}
+          GH_TOKEN: ${{ github.token }}
+        run: python3 .github/scripts/dependency-artifacts.py
+      - name: Download dependency builds
+        if: steps.dependencies.outputs.ids != ''
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          artifact-ids: ${{ steps.dependencies.outputs.ids }}
+          path: dependency-builds
       - name: Build and check this package
         if: steps.reuse.outputs.has-work == 'true' && inputs.artifact == ''
         env:
@@ -122,9 +139,21 @@ jobs:
           if [ -n "$PDR_ROOT" ]; then
             published=(--pdr "$PDR_URL" --pdr-public-key "$PDR_PUBLIC_KEY" --pdr-root "$PDR_ROOT")
           fi
+          # Dependencies built earlier in this run are installed from those builds; a single
+          # download is extracted in place rather than into its own directory.
+          built=()
+          shopt -s nullglob
+          if [ -f dependency-builds/receipt.json ]; then
+            built=(--dependency-artifact dependency-builds)
+          else
+            for build in dependency-builds/*/; do
+              built+=(--dependency-artifact "$build")
+            done
+          fi
           engine-bin/rootbeer-forge --catalog packages prepare "$PACKAGE" \
             --input-key "$INPUT_KEY" --output result \
-            --cache "$RUNNER_TEMP/package-cache" --cache-context "$BUILD_CONTEXT" "${published[@]}"
+            --cache "$RUNNER_TEMP/package-cache" --cache-context "$BUILD_CONTEXT" \
+            "${published[@]}" "${built[@]}"
       - name: Recover the admitted verified build
         if: inputs.artifact != ''
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c

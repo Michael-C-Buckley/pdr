@@ -1,4 +1,5 @@
 import copy
+import hashlib
 import importlib.util
 import json
 import os
@@ -21,6 +22,7 @@ jobs = module('package-jobs')
 producer = module('package-producer')
 proposals = module('propose-updates')
 published_at = module('published-at')
+dependency_artifacts = module('dependency-artifacts')
 
 
 class ProposalLockTests(unittest.TestCase):
@@ -223,6 +225,62 @@ class RegistryTests(unittest.TestCase):
         with patch.object(jobs.subprocess, 'run', side_effect=[missing, outage]):
             with self.assertRaises(RuntimeError):
                 jobs.signed_result('registry/tool', task)
+
+
+class DependencyLevelTests(unittest.TestCase):
+    def task(self, package, *builds):
+        return {'package': package, 'name': package.split('@')[0], 'key': self.key(package), 'builds': list(builds)}
+
+    def key(self, package):
+        return hashlib.sha256(package.encode()).hexdigest()
+
+    def test_builds_follow_the_builds_they_install(self):
+        libiconv = self.task('libiconv@1')
+        libunistring = self.task('libunistring@1', 'libiconv@1')
+        libidn2 = self.task('libidn2@1', 'libiconv@1', 'libunistring@1')
+        levels = jobs.assign_levels([libidn2, libunistring, libiconv])
+        self.assertEqual([[task['package'] for task in level] for level in levels[:3]],
+                         [['libiconv@1'], ['libunistring@1'], ['libidn2@1']])
+        self.assertEqual(libidn2['dependencies'], f"{self.key('libiconv@1')} {self.key('libunistring@1')}")
+        self.assertEqual(libiconv['dependencies'], '')
+        self.assertTrue(all(not level for level in levels[3:]))
+
+    def test_a_dependency_built_outside_the_run_is_compiled_inline(self):
+        curl = self.task('curl@1', 'openssl@1', 'zlib@1')
+        openssl = self.task('openssl@1')
+        levels = jobs.assign_levels([curl, openssl])
+        self.assertEqual(curl['dependencies'], '')
+        self.assertEqual(curl['level'], 1)
+        self.assertEqual(levels[0], [openssl])
+
+    def test_failed_plans_neither_hand_in_nor_order(self):
+        broken = {'package': 'broken@1', 'name': 'broken', 'key': '', 'error': 'no recipe'}
+        consumer = self.task('consumer@1', 'broken@1')
+        jobs.assign_levels([broken, consumer])
+        self.assertEqual((broken['level'], consumer['level'], consumer['dependencies']), (0, 0, ''))
+
+    def test_chains_deeper_than_the_workflow_fail_planning(self):
+        chain = [self.task('p0@1')] + [self.task(f'p{index}@1', f'p{index - 1}@1') for index in range(1, jobs.LEVELS + 1)]
+        with self.assertRaises(ValueError):
+            jobs.assign_levels(chain)
+
+    def test_unselected_unpublished_dependencies_join_the_run(self):
+        planned = {'libunistring@1': [self.task('libunistring@1', 'libiconv@1')],
+                   'libiconv@1': [self.task('libiconv@1')]}
+        with patch.object(jobs, 'plan_request', side_effect=lambda request, _: planned[request]):
+            tasks = jobs.with_unpublished_dependencies([self.task('libidn2@1', 'libunistring@1', 'libiconv@1')], 'system')
+        self.assertEqual(sorted(task['package'] for task in tasks), ['libiconv@1', 'libidn2@1', 'libunistring@1'])
+
+    def test_the_newest_attempt_of_each_dependency_build_is_used(self):
+        a, b = 'a' * 64, 'b' * 64
+        artifacts = [{'id': 1, 'name': f'package-{a}-1', 'expired': False},
+                     {'id': 2, 'name': f'package-{a}-2', 'expired': False},
+                     {'id': 3, 'name': f'package-{b}-1', 'expired': False},
+                     {'id': 4, 'name': f'published-records-{b}', 'expired': False}]
+        self.assertEqual(dependency_artifacts.latest_builds(artifacts, [a, b]), [2, 3])
+        artifacts[2]['expired'] = True
+        with self.assertRaises(ValueError):
+            dependency_artifacts.latest_builds(artifacts, [a, b])
 
 
 class RunnerImageTests(unittest.TestCase):

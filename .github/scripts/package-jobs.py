@@ -144,26 +144,72 @@ def check_planned(expected, tasks, planned_context, context):
         raise ValueError(f'Package inputs changed after planning: expected {expected}, resolved {json.dumps(tasks)}')
 
 
+LEVELS = 8
+
+
+def plan_request(request, system):
+    result = subprocess.run(['engine-bin/rootbeer-forge', '--catalog', os.environ.get('CATALOG', 'packages'),
+                             'package-plan', '--context', os.environ['BUILD_CONTEXT'], *published_dependencies(),
+                             request], text=True, capture_output=True)
+    if result.returncode:
+        return [{'package': request, 'name': request.split('@')[0], 'system': system,
+                 'error': result.stderr.strip(), 'key': ''}]
+    return json.loads(result.stdout)
+
+
+def with_unpublished_dependencies(tasks, system):
+    """Plans every dependency a task would otherwise compile inline, so it builds once in its own job."""
+    planned = {task['package'] for task in tasks}
+    pending = [build for task in tasks for build in task.get('builds', [])]
+    while pending:
+        request = pending.pop()
+        if request in planned:
+            continue
+        planned.add(request)
+        added = plan_request(request, system)
+        tasks.extend(added)
+        pending.extend(build for task in added for build in task.get('builds', []))
+    return tasks
+
+
+def assign_levels(missing):
+    """Orders the builds of one run so each follows the builds it installs instead of compiling.
+
+    A task hands in its dependencies' builds only when this run builds all of them; otherwise it
+    compiles them inline, as a dependency published outside the run's root cannot be handed in.
+    """
+    by_package = {task['package']: task for task in missing if not task.get('error')}
+    levels = {}
+
+    def level(task):
+        if task['package'] not in levels:
+            inputs = [by_package[build] for build in task.get('builds', []) if build in by_package]
+            levels[task['package']] = 1 + max(map(level, inputs), default=-1)
+        return levels[task['package']]
+
+    for task in missing:
+        builds = task.get('builds', [])
+        is_handed_in = all(build in by_package for build in builds)
+        task['dependencies'] = ' '.join(by_package[build]['key'] for build in builds) if is_handed_in else ''
+        task['level'] = 0 if task.get('error') else level(task)
+    if any(task['level'] >= LEVELS for task in missing):
+        raise ValueError(f'Dependency chains deeper than {LEVELS} builds need more workflow levels')
+    return [[task for task in missing if task['level'] == index] for index in range(LEVELS)]
+
+
 def plan():
     requests = os.environ['PACKAGES'].split()
     if not requests or any(not re.fullmatch(r'[a-z0-9][a-z0-9+._-]*@[A-Za-z0-9._+-]+', item) for item in requests):
         raise ValueError('Select exact packages: name@version separated by spaces')
     engine = 'engine-bin/rootbeer-forge'
-    tasks = []
     system = {'ubuntu-24.04': 'x86_64-linux', 'ubuntu-24.04-arm': 'aarch64-linux',
               'macos-15': 'aarch64-macos'}[os.environ['PACKAGE_RUNNER']]
-    for request in requests:
-        result = subprocess.run([engine, '--catalog', os.environ.get('CATALOG', 'packages'), 'package-plan',
-                                 '--context', os.environ['BUILD_CONTEXT'], *published_dependencies(), request],
-                                text=True, capture_output=True)
-        if result.returncode:
-            tasks.append({'package': request, 'name': request.split('@')[0], 'system': system,
-                          'error': result.stderr.strip(), 'key': ''})
-            continue
-        tasks.extend(json.loads(result.stdout))
+    tasks = [task for request in requests for task in plan_request(request, system)]
     expected = os.environ.get('EXPECTED_KEY')
     if expected:
         check_planned(expected, tasks, os.environ.get('PLANNED_CONTEXT', ''), os.environ['BUILD_CONTEXT'])
+    else:
+        tasks = with_unpublished_dependencies(tasks, system)
     missing = []
     reused = []
     reuse_run = os.environ.get('REUSE_RUN', '')
@@ -201,8 +247,11 @@ def plan():
     Path('package-plan.json').write_text(json.dumps({'tasks': tasks, 'reused': [key for _, _, key in reused]}))
     if len(missing) > 256:
         raise ValueError('GitHub permits 256 jobs per matrix; submit smaller package selections')
+    levels = assign_levels(missing)
     with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
-        output.write(f'matrix={json.dumps({"include": missing}, separators=(",", ":"))}\n')
+        for index, entries in enumerate(levels):
+            output.write(f'level_{index}={json.dumps({"include": entries}, separators=(",", ":"))}\n')
+        output.write(f'depth={sum(1 for entries in levels if entries)}\n')
         output.write(f'has-work={str(bool(missing)).lower()}\n')
         if expected:
             output.write(f"key={tasks[0]['key']}\n")
@@ -210,7 +259,8 @@ def plan():
         summary.write(f'{len(missing)} packages to build; {len(reused)} signed results reused.\n\n')
         for task in missing:
             action = 'Recover verified build' if task.get('artifact') else 'Build'
-            summary.write(f"- {action} `{task['package']}` for `{task['system']}`\n")
+            handed = f", with {len(task['dependencies'].split())} dependency builds" if task['dependencies'] else ''
+            summary.write(f"- {action} `{task['package']}` for `{task['system']}` (level {task['level']}{handed})\n")
         for task, reference, _ in reused:
             summary.write(f"- Reuse `{task['package']}`: `{reference}`\n")
 
