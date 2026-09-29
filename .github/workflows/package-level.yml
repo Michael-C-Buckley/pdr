@@ -83,6 +83,14 @@ jobs:
           engine-bin/rootbeer-forge build work/plan.json "$PACKAGE"
           # A result published while this job was queued is kept instead of a second build.
           jq -r '"key=\(.built.key // .reused.key)", "built=\(has("built"))"' result/build.json >> "$GITHUB_OUTPUT"
+      - name: Retain the logs of a failed build
+        if: failure() && steps.build.conclusion == 'failure'
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: build-logs-${{ matrix.package }}-${{ inputs.runner }}-${{ github.run_attempt }}
+          path: result/*.log
+          if-no-files-found: ignore
+          retention-days: 7
       - name: Keep the record published while this job was queued
         if: steps.build.outputs.built == 'false'
         env:
