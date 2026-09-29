@@ -16,7 +16,13 @@ return {
     },
     build = {
         backend = "custom",
-        libraries = { "lib/libssl.a", "lib/libcrypto.a" },
+        dependencies = { "perl@5.44.0" },
+        libraries = {
+            "lib/libssl.a",
+            "lib/libcrypto.a",
+            "lib/libssl.{shared_extension}",
+            "lib/libcrypto.{shared_extension}",
+        },
         steps = {
             configure = {
                 {
@@ -25,7 +31,6 @@ return {
                     "--prefix=/",
                     "--libdir=lib",
                     "--openssldir=/etc/ssl",
-                    "no-shared",
                     "no-module",
                 },
             },
@@ -54,6 +59,37 @@ return {
         },
         ["aarch64-macos"] = {
             default_version = "4.0.2",
+            build = {
+                backend = "custom",
+                dependencies = { "perl@5.44.0" },
+                libraries = {
+                    "lib/libssl.a",
+                    "lib/libcrypto.a",
+                    "lib/libssl.{shared_extension}",
+                    "lib/libcrypto.{shared_extension}",
+                },
+                steps = {
+                    configure = {
+                        {
+                            "perl",
+                            "./Configure",
+                            "--prefix=/",
+                            "--libdir=lib",
+                            "--openssldir=/etc/ssl",
+                            "no-module",
+                        },
+                    },
+                    build = {
+                        { "make", "-j{jobs}" },
+                    },
+                    check = {
+                        { "/usr/bin/env", "HARNESS_JOBS={jobs}", "make", "test", "TESTS=-test_ca" },
+                    },
+                    install = {
+                        { "make", "DESTDIR={prefix}", "install_sw" },
+                    },
+                },
+            },
         },
         ["x86_64-linux"] = {
             default_version = "4.0.2",
@@ -66,6 +102,7 @@ return {
                 ["aarch64-macos"] = "736b467530f916737b7031310ccb21d8218c6229e61e8e160cd1d3458cd543a8",
                 ["x86_64-linux"] = "736b467530f916737b7031310ccb21d8218c6229e61e8e160cd1d3458cd543a8",
             },
+            revision = 2,
         },
     },
 }
