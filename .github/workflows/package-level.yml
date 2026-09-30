@@ -79,6 +79,8 @@ jobs:
         id: build
         env:
           PACKAGE: ${{ matrix.package }}
+          # Upstream release lookups are rate limited to 60 an hour per runner without it.
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           .github/builder/run engine-bin/rootbeer-forge build work/plan.json "$PACKAGE"
           # A result published while this job was queued is kept instead of a second build.
