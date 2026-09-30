@@ -4,6 +4,11 @@ return {
     homepage = "https://orbstack.dev/",
     recipe_maintainers = { "tale" },
     default_license = "LicenseRef-Proprietary",
+    upstream = {
+        sparkle = "https://api-updates.orbstack.dev/arm64/appcast.xml?bucket=99",
+        public_key = "nuUHoUatJ4OxpNCGb5NJ7s5WQYBG4iiZ6rm8JCk0sNQ=",
+        channel = "stable",
+    },
     prebuilt = {
         url = "https://cdn-updates.orbstack.dev/arm64/OrbStack_v2.2.3_20963_arm64.dmg",
         install = "Dmg",

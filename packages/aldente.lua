@@ -4,6 +4,10 @@ return {
     homepage = "https://apphousekitchen.com/",
     recipe_maintainers = { "tale" },
     default_license = "LicenseRef-Proprietary",
+    upstream = {
+        sparkle = "https://apphousekitchen.com/aldente/aldenteproappcast.xml",
+        public_key = "QXLHUNZcvghym92nG0zfv/ibtTwLOLD7SurlZOJ/TPU=",
+    },
     prebuilt = {
         url = "https://apphousekitchen.com/aldente/AlDente{version}.dmg",
         install = "Dmg",
