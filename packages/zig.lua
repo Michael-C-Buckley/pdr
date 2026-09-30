@@ -4,6 +4,9 @@ return {
     homepage = "https://ziglang.org",
     recipe_maintainers = { "tale" },
     default_license = "MIT",
+    upstream = {
+        git = "https://codeberg.org/ziglang/zig.git",
+    },
     prebuilt = {
         url = "https://ziglang.org/download/{version}/zig-{target}-{version}.tar.xz",
         install = {

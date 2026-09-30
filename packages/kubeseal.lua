@@ -5,7 +5,7 @@ return {
     recipe_maintainers = { "tale" },
     default_license = "Apache-2.0",
     upstream = {
-        github = "bitnami-labs/sealed-secrets",
+        github = "bitnami/sealed-secrets",
         repository_id = 92702519,
         tag = "v{version}",
     },

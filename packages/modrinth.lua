@@ -4,6 +4,10 @@ return {
     homepage = "https://modrinth.com/app",
     recipe_maintainers = { "tale" },
     default_license = "GPL-3.0-only",
+    upstream = {
+        github = "modrinth/code",
+        tag = "v{version}",
+    },
     prebuilt = {
         url = "https://launcher-files.modrinth.com/versions/{version}/macos/Modrinth%20App_{version}_universal.dmg",
         install = "Dmg",

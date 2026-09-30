@@ -4,8 +4,12 @@ return {
     homepage = "https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/keyutils.git",
     recipe_maintainers = { "tale" },
     default_license = "GPL-2.0-or-later AND LGPL-2.1-or-later",
+    upstream = {
+        git = "https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/keyutils.git",
+        tag = "v{version}",
+    },
     -- Upstream publishes only kernel.org cgit snapshots; the people.redhat.com
-    -- tarballs are gone. Versions are updated by hand.
+    -- tarballs are gone.
     source = {
         url = "https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/keyutils.git/snapshot/keyutils-{version}.tar.gz",
         archive = "tar.gz",

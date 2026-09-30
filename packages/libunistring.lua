@@ -4,6 +4,10 @@ return {
     homepage = "https://www.gnu.org/software/libunistring/",
     recipe_maintainers = { "tale" },
     default_license = "LGPL-3.0-or-later OR GPL-2.0-or-later",
+    upstream = {
+        git = "https://https.git.savannah.gnu.org/git/libunistring.git",
+        tag = "v{version}",
+    },
     source = {
         url = "https://ftp.gnu.org/gnu/libunistring/libunistring-{version}.tar.gz",
         archive = "tar.gz",

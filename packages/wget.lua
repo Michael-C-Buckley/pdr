@@ -4,6 +4,10 @@ return {
     homepage = "https://www.gnu.org/software/wget/",
     recipe_maintainers = { "tale" },
     default_license = "GPL-3.0-or-later",
+    upstream = {
+        git = "https://https.git.savannah.gnu.org/git/wget.git",
+        tag = "v{version}",
+    },
     source = {
         url = "https://ftp.gnu.org/gnu/wget/wget-{version}.tar.gz",
         archive = "tar.gz",

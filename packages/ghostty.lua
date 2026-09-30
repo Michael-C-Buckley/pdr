@@ -4,6 +4,10 @@ return {
     homepage = "https://ghostty.org/",
     recipe_maintainers = { "tale" },
     default_license = "MIT",
+    upstream = {
+        github = "ghostty-org/ghostty",
+        tag = "v{version}",
+    },
     prebuilt = {
         url = "https://release.files.ghostty.org/{version}/Ghostty.dmg",
         install = "Dmg",

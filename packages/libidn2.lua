@@ -4,6 +4,10 @@ return {
     homepage = "https://www.gnu.org/software/libidn/",
     recipe_maintainers = { "tale" },
     default_license = "(LGPL-3.0-or-later OR GPL-2.0-or-later) AND GPL-3.0-or-later",
+    upstream = {
+        git = "https://gitlab.com/libidn/libidn2.git",
+        tag = "v{version}",
+    },
     source = {
         url = "https://ftp.gnu.org/gnu/libidn/libidn2-{version}.tar.gz",
         archive = "tar.gz",

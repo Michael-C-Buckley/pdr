@@ -4,8 +4,10 @@ return {
     homepage = "https://nlnetlabs.nl/projects/ldns/about/",
     recipe_maintainers = { "tale" },
     default_license = "BSD-3-Clause",
-    -- Upstream tags releases without publishing GitHub releases, which discovery reads, so
-    -- versions are updated by hand.
+    upstream = {
+        github = "NLnetLabs/ldns",
+        tag = "release-{version}",
+    },
     source = {
         url = "https://nlnetlabs.nl/downloads/ldns/ldns-{version}.tar.gz",
         archive = "tar.gz",

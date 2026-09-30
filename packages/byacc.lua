@@ -4,7 +4,10 @@ return {
     homepage = "https://invisible-island.net/byacc/",
     recipe_maintainers = { "tale" },
     default_license = "LicenseRef-Public-Domain",
-    -- Released only on invisible-island.net, so versions are updated by hand.
+    upstream = {
+        github = "ThomasDickey/byacc-snapshots",
+        tag = "t{version}",
+    },
     source = {
         url = "https://invisible-island.net/archives/byacc/byacc-{version}.tgz",
         archive = "tar.gz",

@@ -4,6 +4,10 @@ return {
     homepage = "https://www.gnu.org/software/libiconv/",
     recipe_maintainers = { "tale" },
     default_license = "LGPL-2.1-or-later AND GPL-3.0-or-later",
+    upstream = {
+        git = "https://https.git.savannah.gnu.org/git/libiconv.git",
+        tag = "v{version}",
+    },
     source = {
         url = "https://ftp.gnu.org/gnu/libiconv/libiconv-{version}.tar.gz",
         archive = "tar.gz",

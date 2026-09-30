@@ -4,7 +4,10 @@ return {
     homepage = "https://www.zsh.org",
     recipe_maintainers = { "tale" },
     default_license = "MIT-Modern-Variant",
-    -- Released only on zsh.org, so versions are updated by hand.
+    upstream = {
+        git = "https://git.code.sf.net/p/zsh/code",
+        tag = "zsh-{version}",
+    },
     source = {
         url = "https://www.zsh.org/pub/zsh-{version}.tar.xz",
         archive = "tar.xz",

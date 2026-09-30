@@ -4,6 +4,11 @@ return {
     homepage = "https://www.gnu.org/software/gengetopt/",
     recipe_maintainers = { "tale" },
     default_license = "GPL-3.0-or-later",
+    upstream = {
+        git = "https://https.git.savannah.gnu.org/git/gengetopt.git",
+        tag = "rel_{version}",
+        separator = "_",
+    },
     source = {
         url = "https://ftp.gnu.org/gnu/gengetopt/gengetopt-{version}.tar.xz",
         archive = "tar.xz",

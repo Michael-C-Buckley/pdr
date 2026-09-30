@@ -4,7 +4,10 @@ return {
     homepage = "https://www.lua.org",
     recipe_maintainers = { "tale" },
     default_license = "MIT",
-    -- Released only on lua.org, so versions are updated by hand.
+    upstream = {
+        github = "lua/lua",
+        tag = "v{version}",
+    },
     source = {
         url = "https://www.lua.org/ftp/lua-{version}.tar.gz",
         archive = "tar.gz",

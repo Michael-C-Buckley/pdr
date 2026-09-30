@@ -4,9 +4,11 @@ return {
     homepage = "https://web.mit.edu/kerberos/",
     recipe_maintainers = { "tale" },
     default_license = "MIT",
+    upstream = {
+        github = "krb5/krb5",
+        tag = "krb5-{version}-final",
+    },
     -- Built from the top level so upstream commits apply as published.
-    -- Upstream tags releases without publishing GitHub releases, which discovery reads, so
-    -- versions are updated by hand.
     source = {
         url = "https://kerberos.org/dist/krb5/{major}.{minor}/krb5-{version}.tar.gz",
         archive = "tar.gz",

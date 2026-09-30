@@ -4,6 +4,9 @@ return {
     homepage = "https://www.gnu.org/software/make/",
     recipe_maintainers = { "tale" },
     default_license = "GPL-3.0-or-later",
+    upstream = {
+        git = "https://https.git.savannah.gnu.org/git/make.git",
+    },
     source = {
         url = "https://ftp.gnu.org/gnu/make/make-{version}.tar.gz",
         archive = "tar.gz",

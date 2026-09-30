@@ -4,8 +4,10 @@ return {
     homepage = "https://cmocka.org/",
     recipe_maintainers = { "tale" },
     default_license = "Apache-2.0",
-    -- Released only on cmocka.org and GitLab, so versions are updated by hand until
-    -- discovery supports another provider.
+    upstream = {
+        git = "https://gitlab.com/cmocka/cmocka.git",
+        tag = "cmocka-{version}",
+    },
     source = {
         url = "https://cmocka.org/files/{major}.{minor}/cmocka-{version}.tar.xz",
         archive = "tar.xz",

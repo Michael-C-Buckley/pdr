@@ -4,7 +4,9 @@ return {
     homepage = "https://oldmanprogrammer.net/source.php?dir=projects/tree",
     recipe_maintainers = { "tale" },
     default_license = "GPL-2.0-or-later",
-    -- Released only on gitlab.com, so versions are updated by hand.
+    upstream = {
+        git = "https://gitlab.com/OldManProgrammer/unix-tree.git",
+    },
     source = {
         url = "https://gitlab.com/OldManProgrammer/unix-tree/-/archive/{version}/unix-tree-{version}.tar.gz",
         archive = "tar.gz",

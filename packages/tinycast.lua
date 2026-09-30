@@ -4,6 +4,10 @@ return {
     homepage = "https://tinycast.dev",
     recipe_maintainers = { "tale" },
     default_license = "AGPL-3.0-or-later",
+    upstream = {
+        github = "abue-ammar/tinycast",
+        tag = "v{version}",
+    },
     prebuilt = {
         url = "https://github.com/abue-ammar/tinycast/releases/download/v{version}/Tinycast-{version}.dmg",
         install = "Dmg",

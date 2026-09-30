@@ -5,7 +5,7 @@ return {
     recipe_maintainers = { "tale" },
     default_license = "Apache-2.0",
     upstream = {
-        github = "vmware-tanzu/velero",
+        github = "velero-io/velero",
         repository_id = 99143276,
         tag = "v{version}",
     },

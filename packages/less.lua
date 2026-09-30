@@ -4,7 +4,10 @@ return {
     homepage = "https://www.greenwoodsoftware.com/less/",
     recipe_maintainers = { "tale" },
     default_license = "GPL-3.0-or-later OR BSD-2-Clause",
-    -- Released only on greenwoodsoftware.com, so versions are updated by hand.
+    upstream = {
+        github = "gwsw/less",
+        tag = "v{version}-rel",
+    },
     source = {
         url = "https://www.greenwoodsoftware.com/less/less-{version}.tar.gz",
         archive = "tar.gz",

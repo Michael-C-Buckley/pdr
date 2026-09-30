@@ -4,6 +4,10 @@ return {
     homepage = "https://betterdisplay.pro/",
     recipe_maintainers = { "tale" },
     default_license = "LicenseRef-Proprietary",
+    upstream = {
+        github = "waydabber/BetterDisplay",
+        tag = "v{version}",
+    },
     prebuilt = {
         url = "https://github.com/waydabber/BetterDisplay/releases/download/v{version}/BetterDisplay-v{version}.dmg",
         install = "Dmg",

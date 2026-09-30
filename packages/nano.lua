@@ -4,7 +4,10 @@ return {
     homepage = "https://www.nano-editor.org",
     recipe_maintainers = { "tale" },
     default_license = "GPL-3.0-or-later",
-    -- Released only on nano-editor.org, so versions are updated by hand.
+    upstream = {
+        git = "https://https.git.savannah.gnu.org/git/nano.git",
+        tag = "v{version}",
+    },
     source = {
         url = "https://www.nano-editor.org/dist/v{major}/nano-{version}.tar.xz",
         archive = "tar.xz",

@@ -4,8 +4,11 @@ return {
     homepage = "https://www.gnu.org/software/bash/",
     recipe_maintainers = { "tale" },
     default_license = "GPL-3.0-or-later",
-    -- Released only on ftp.gnu.org, so versions are updated by hand. Upstream's numbered patches
-    -- for 5.3 aren't applied yet.
+    upstream = {
+        git = "https://https.git.savannah.gnu.org/git/bash.git",
+        tag = "bash-{version}",
+    },
+    -- Upstream's numbered patches for 5.3 aren't applied yet.
     source = {
         url = "https://ftp.gnu.org/gnu/bash/bash-{version}.tar.gz",
         archive = "tar.gz",

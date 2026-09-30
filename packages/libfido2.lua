@@ -4,8 +4,9 @@ return {
     homepage = "https://developers.yubico.com/libfido2/",
     recipe_maintainers = { "tale" },
     default_license = "BSD-2-Clause",
-    -- Upstream tags releases without publishing GitHub releases, which discovery reads, so
-    -- versions are updated by hand.
+    upstream = {
+        github = "Yubico/libfido2",
+    },
     source = {
         url = "https://developers.yubico.com/libfido2/Releases/libfido2-{version}.tar.gz",
         archive = "tar.gz",

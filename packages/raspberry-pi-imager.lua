@@ -5,6 +5,10 @@ return {
     homepage = "https://www.raspberrypi.com/software/",
     recipe_maintainers = { "tale" },
     default_license = "Apache-2.0",
+    upstream = {
+        github = "raspberrypi/rpi-imager",
+        tag = "v{version}",
+    },
     prebuilt = {
         url = "https://github.com/raspberrypi/rpi-imager/releases/download/v{version}/rpi-imager-v{version}.dmg",
         install = "Dmg",

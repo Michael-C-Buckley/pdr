@@ -4,6 +4,10 @@ return {
     homepage = "https://mac.getutm.app/",
     recipe_maintainers = { "tale" },
     default_license = "Apache-2.0",
+    upstream = {
+        github = "utmapp/UTM",
+        tag = "v{version}",
+    },
     prebuilt = {
         url = "https://github.com/utmapp/UTM/releases/download/v{version}/UTM.dmg",
         install = "Dmg",
