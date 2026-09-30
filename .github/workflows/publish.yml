@@ -14,6 +14,7 @@ jobs:
     uses: ./.github/workflows/package-builds.yml
     secrets:
       PDR_SIGNING_KEY: ${{ secrets.PDR_SIGNING_KEY }}
+      ROOTBEER_BOT_PRIVATE_KEY: ${{ secrets.ROOTBEER_BOT_PRIVATE_KEY }}
     permissions:
       contents: write
       actions: read
