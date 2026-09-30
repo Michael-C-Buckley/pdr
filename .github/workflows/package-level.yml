@@ -110,6 +110,7 @@ jobs:
           name: package-${{ steps.build.outputs.key }}-${{ github.run_attempt }}
           path: |
             result/package.tar.gz
+            result/upstream
             result/receipt.json
             result/build.json
           if-no-files-found: error
