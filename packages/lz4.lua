@@ -16,6 +16,8 @@ return {
     },
     build = {
         backend = "custom",
+        -- The tests pipe into diff, which buffers stdin in /tmp.
+        allow = { "tmp" },
         libraries = { "lib/liblz4.a", "lib/liblz4.{shared_extension}" },
         steps = {
             configure = {
@@ -30,13 +32,13 @@ return {
                 },
             },
             build = {
-                { "make", "-j{jobs}", "PREFIX=/" },
+                { "make", "-j{jobs}", "PREFIX={prefix}" },
             },
             check = {
-                { "make", "PREFIX=/", "test" },
+                { "make", "PREFIX={prefix}", "test" },
             },
             install = {
-                { "make", "PREFIX=/", "DESTDIR={prefix}", "install" },
+                { "make", "PREFIX={prefix}", "install" },
             },
         },
     },

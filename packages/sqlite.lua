@@ -25,7 +25,7 @@ return {
                 {
                     "sh",
                     "./configure",
-                    "--prefix=/",
+                    "--prefix={prefix}",
                     "--disable-shared",
                     "--enable-static",
                     "--fts4",
@@ -38,7 +38,7 @@ return {
                     -- Configure only selects <editline/readline.h> when its own search of host
                     -- prefixes finds it, so the flags switch the shell to that header directly.
                     "--editline",
-                    "--with-readline-cflags=-I{dependencies}/include -UHAVE_READLINE -DHAVE_EDITLINE=1",
+                    "--with-readline-cflags=-I{dependencies.libedit}/include -UHAVE_READLINE -DHAVE_EDITLINE=1",
                     "--with-readline-ldflags=-ledit -lncurses",
                 },
             },
@@ -55,7 +55,7 @@ return {
                 },
             },
             install = {
-                { "make", "DESTDIR={prefix}", "install" },
+                { "make", "install" },
             },
         },
     },

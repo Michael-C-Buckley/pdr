@@ -7,6 +7,9 @@ return {
     prebuilt = {
         url = "https://download.jetbrains.com/datagrip/datagrip-2026.2.5-aarch64.dmg",
         install = "Dmg",
+        dependencies = {
+            { package = "7zip", version = "26.04", kind = "build" },
+        },
         mirror = true,
     },
     outputs = {
@@ -17,6 +20,9 @@ return {
     platforms = {
         ["aarch64-macos"] = {
             default_version = "2026.2.5+262.10315.132",
+            outputs = {
+                host = { "@rpath/libjvm.dylib" },
+            },
         },
     },
     versions = {

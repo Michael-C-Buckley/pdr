@@ -25,13 +25,13 @@ return {
                 {
                     "sh",
                     "./configure",
-                    "--prefix=/",
+                    "--prefix={prefix}",
                     "--disable-shared",
                     "--enable-static",
                     "--disable-examples",
                     -- Our ncurses installs its headers under include/ncurses, and libedit's configure
                     -- ignores pkg-config.
-                    "CPPFLAGS=-I{dependencies}/include/ncurses",
+                    "CPPFLAGS=-I{dependencies.ncurses}/include/ncurses",
                 },
             },
             build = {
@@ -41,7 +41,7 @@ return {
                 { "make", "check" },
             },
             install = {
-                { "make", "DESTDIR={prefix}", "install" },
+                { "make", "install" },
             },
         },
     },

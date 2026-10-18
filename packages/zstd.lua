@@ -16,6 +16,8 @@ return {
     },
     build = {
         backend = "custom",
+        -- playTests pipes into diff, which buffers stdin in /tmp.
+        allow = { "tmp" },
         dependencies = {
             {
                 package = "cmake",
@@ -59,16 +61,16 @@ return {
                     "-DZSTD_FUZZER_FLAGS=-T60s",
                     "-DZSTD_ZSTREAM_FLAGS=-T60s",
                     "-DZSTD_FULLBENCH_FLAGS=-i1",
-                    "-DZLIB_INCLUDE_DIR={dependencies}/include",
-                    "-DZLIB_LIBRARY={dependencies}/lib/libz.{shared_extension}",
-                    "-DLIBLZMA_INCLUDE_DIR={dependencies}/include",
-                    "-DLIBLZMA_LIBRARY={dependencies}/lib/liblzma.a",
-                    "-DLIBLZ4_INCLUDE_DIR={dependencies}/include",
-                    "-DLIBLZ4_LIBRARY={dependencies}/lib/liblz4.{shared_extension}",
-                    "-DCMAKE_INSTALL_PREFIX=/",
-                    "-DCMAKE_INSTALL_BINDIR=/bin",
-                    "-DCMAKE_INSTALL_LIBDIR=/lib",
-                    "-DCMAKE_INSTALL_INCLUDEDIR=/include",
+                    "-DZLIB_INCLUDE_DIR={dependencies.zlib}/include",
+                    "-DZLIB_LIBRARY={dependencies.zlib}/lib/libz.{shared_extension}",
+                    "-DLIBLZMA_INCLUDE_DIR={dependencies.xz}/include",
+                    "-DLIBLZMA_LIBRARY={dependencies.xz}/lib/liblzma.a",
+                    "-DLIBLZ4_INCLUDE_DIR={dependencies.lz4}/include",
+                    "-DLIBLZ4_LIBRARY={dependencies.lz4}/lib/liblz4.{shared_extension}",
+                    "-DCMAKE_INSTALL_PREFIX={prefix}",
+                    "-DCMAKE_INSTALL_BINDIR=bin",
+                    "-DCMAKE_INSTALL_LIBDIR=lib",
+                    "-DCMAKE_INSTALL_INCLUDEDIR=include",
                 },
             },
             build = {
@@ -86,7 +88,7 @@ return {
                 },
             },
             install = {
-                { "/usr/bin/env", "DESTDIR={prefix}", "cmake", "--install", "output" },
+                { "cmake", "--install", "output" },
             },
         },
     },

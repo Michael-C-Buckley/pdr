@@ -16,6 +16,8 @@ return {
     },
     build = {
         backend = "custom",
+        -- TLS, QUIC, and HTTP tests run servers on loopback.
+        allow = { "local-network" },
         dependencies = {
             {
                 package = "perl",
@@ -34,7 +36,7 @@ return {
                 {
                     "perl",
                     "./Configure",
-                    "--prefix=/",
+                    "--prefix={prefix}",
                     "--libdir=lib",
                     "--openssldir=/etc/ssl",
                     "no-module",
@@ -47,7 +49,7 @@ return {
                 { "/usr/bin/env", "HARNESS_JOBS={jobs}", "make", "test" },
             },
             install = {
-                { "make", "DESTDIR={prefix}", "install_sw" },
+                { "make", "install_sw" },
             },
         },
     },
@@ -67,6 +69,8 @@ return {
             default_version = "4.0.3",
             build = {
                 backend = "custom",
+                -- TLS, QUIC, and HTTP tests run servers on loopback.
+                allow = { "local-network" },
                 dependencies = {
                     {
                         package = "perl",
@@ -85,7 +89,7 @@ return {
                         {
                             "perl",
                             "./Configure",
-                            "--prefix=/",
+                            "--prefix={prefix}",
                             "--libdir=lib",
                             "--openssldir=/etc/ssl",
                             "no-module",
@@ -98,7 +102,7 @@ return {
                         { "/usr/bin/env", "HARNESS_JOBS={jobs}", "make", "test", "TESTS=-test_ca" },
                     },
                     install = {
-                        { "make", "DESTDIR={prefix}", "install_sw" },
+                        { "make", "install_sw" },
                     },
                 },
             },

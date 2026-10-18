@@ -7,6 +7,9 @@ return {
     prebuilt = {
         url = "https://cdn.cloudflare.steamstatic.com/client/installer/steam.dmg",
         install = "Dmg",
+        dependencies = {
+            { package = "7zip", version = "26.04", kind = "build" },
+        },
         mirror = true,
     },
     outputs = {

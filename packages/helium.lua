@@ -36,12 +36,16 @@ return {
                 github = "imputnet/helium-macos",
                 tag = "{version}",
                 asset = "helium_{version}_arm64-macos.dmg",
+                dependencies = {
+                    { package = "7zip", version = "26.04", kind = "build" },
+                },
                 mirror = true,
             },
             outputs = {
                 apps = {
                     ["Helium.app"] = "Helium.app",
                 },
+                host = { "/bin/bash" },
             },
         },
         ["x86_64-linux"] = {

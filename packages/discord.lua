@@ -7,6 +7,9 @@ return {
     prebuilt = {
         url = "https://dl.discordapp.net/apps/osx/{version}/Discord.dmg",
         install = "Dmg",
+        dependencies = {
+            { package = "7zip", version = "26.04", kind = "build" },
+        },
         mirror = true,
     },
     outputs = {

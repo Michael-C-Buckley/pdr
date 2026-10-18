@@ -7,6 +7,9 @@ return {
     prebuilt = {
         url = "https://updates.getcleanshot.com/v3/CleanShot-X-{version}.dmg",
         install = "Dmg",
+        dependencies = {
+            { package = "7zip", version = "26.04", kind = "build" },
+        },
         mirror = true,
     },
     outputs = {

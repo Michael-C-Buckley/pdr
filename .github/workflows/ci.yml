@@ -1,0 +1,209 @@
+name: Packages
+# PRs build and check. Pushes, which only a merge or an admin can make, build
+# again and publish what they built to the store.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions: {}
+
+concurrency:
+  group: rb-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+env:
+  PACKAGES: >-
+    7zip act actionlint age agg air aldente argc argocd asciinema atuin bacon bandwhich bash
+    bat betterdisplay bobrwm bottom broot brotli btop buf byacc caddy cargo-nextest check
+    chezmoi choose cilium-cli cleanshot cloudflared cmake cmocka copilot-money cosign crane
+    croc curl dasel datagrip delta delve devspace difftastic direnv discord dive
+    docker-compose doggo dprint duf dufs dust expat eza fastfetch fd flux fnm fx fzf gdu
+    gengetopt gh ghostty git git-cliff git-lfs gitleaks gitui glow gmx go gofumpt
+    golangci-lint google-chrome goose goreleaser gping grex gron grpcurl grype gum helium
+    helix helm helmfile hexyl htop hubble hyperfine intermodal jj jless jq just k3d k9s
+    keyutils kind kitty ko kompose krb5 krew kubeconform kubectl kubectx kubeseal lazydocker
+    lazygit ldns lefthook less libcbor libedit libevent libfido2 libiconv libidn2 libpsl
+    libssh2 libudev-zero libunistring libxcrypt lsd lua luajit lz4 make mc mdbook migrate
+    minikube miniserve mise mkcert mockery modrinth nano nats navi ncurses neovim nghttp2
+    nghttp3 ngtcp2 nushell oha op opencode openssh openssl oras orbstack ouch pastel perl
+    pkgconf procs prtui rage raspberry-pi-imager raycast rclone restic ripgrep rootbeer
+    rsync ruff rush rust rust-analyzer rustic sd shellcheck shfmt skaffold sops sqlc sqlite
+    starship staticcheck steam step stern stylua syft tailscale talosctl taplo task tealdeer
+    telnet tflint tilt tinycast tmux tokei topgrade tree tree-sitter trivy typos typst utm
+    uv velero vivid watchexec wget xh xxhash xz yazi yq yubico-piv-tool zellij zig zlib zmx
+    zoxide zsh zstd
+  REGISTRY: https://ghcr.io
+  STORE: rootbeer-org/store
+
+jobs:
+  eval:
+    name: Plan
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      packages: read
+    outputs:
+      x86_64-linux: ${{ steps.plan.outputs.x86_64-linux }}
+      aarch64-linux: ${{ steps.plan.outputs.aarch64-linux }}
+      aarch64-macos: ${{ steps.plan.outputs.aarch64-macos }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: rootbeer-org/setup-rb@bf50460fdf9e1b17508117150b26b624b840d08c
+      - name: Plan what the store doesn't have
+        id: plan
+        env:
+          RB_REGISTRY_USER: ${{ github.actor }}
+          RB_REGISTRY_TOKEN: ${{ github.token }}
+        run: |
+          for platform in x86_64-linux aarch64-linux aarch64-macos; do
+            # shellcheck disable=SC2086
+            plan=$(rb drv plan $PACKAGES --platform "$platform" --registry "$REGISTRY" --from "$STORE")
+            if ! jq --exit-status '.levels | length <= 8' <<< "$plan" > /dev/null; then
+              echo "$platform needs more than build.yml's eight levels" >&2
+              exit 1
+            fi
+            echo "$platform=$plan" >> "$GITHUB_OUTPUT"
+          done
+
+  builder:
+    name: Builder (${{ matrix.runner }})
+    if: github.event_name == 'push'
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    strategy:
+      matrix:
+        runner: [ubuntu-24.04, ubuntu-24.04-arm]
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - name: Publish the builder image unless ghcr has it
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          docker login ghcr.io --username "$GITHUB_ACTOR" --password-stdin <<< "$GH_TOKEN"
+          hash=$(sha256sum < .github/builder/Dockerfile)
+          image="ghcr.io/rootbeer-org/builder:${hash%% *}-$(uname -m)"
+          if docker manifest inspect "$image" > /dev/null 2>&1; then
+            echo "$image is already published"
+            exit 0
+          fi
+          docker build --tag "$image" .github/builder
+          docker push "$image"
+
+  build:
+    name: Build (${{ matrix.platform }})
+    needs: [eval, builder]
+    if: ${{ !cancelled() && needs.eval.result == 'success' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: x86_64-linux
+            runner: ubuntu-24.04
+          - platform: aarch64-linux
+            runner: ubuntu-24.04-arm
+          - platform: aarch64-macos
+            runner: macos-15
+    uses: ./.github/workflows/build.yml
+    permissions:
+      contents: read
+      packages: read
+    with:
+      platform: ${{ matrix.platform }}
+      runner: ${{ matrix.runner }}
+      plan: ${{ needs.eval.outputs[matrix.platform] }}
+
+  # The one check the default branch's ruleset requires
+  checks:
+    name: Package checks
+    needs: [eval, build]
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Require the plan and every platform's build
+        env:
+          EVAL: ${{ needs.eval.result }}
+          BUILD: ${{ needs.build.result }}
+        run: |
+          echo "plan $EVAL, build $BUILD"
+          [[ $EVAL == success && $BUILD == success ]]
+
+  # The workflow token can write the store from any branch's workflow, so the
+  # store is only as safe as push access to this repository. Whatever built is
+  # published, and a failed package holds back only what depends on it.
+  publish:
+    name: Publish
+    needs: [eval, build]
+    if: ${{ !cancelled() && needs.eval.result == 'success' && github.event_name == 'push' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: rootbeer-org/setup-rb@bf50460fdf9e1b17508117150b26b624b840d08c
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c
+        with:
+          pattern: build-*
+          path: outputs
+          merge-multiple: true
+      - name: Publish this run's outputs to the store
+        env:
+          RB_REGISTRY_USER: ${{ github.actor }}
+          RB_REGISTRY_TOKEN: ${{ github.token }}
+        run: |
+          if [[ ! -d outputs ]]; then
+            echo 'Nothing was built, so nothing is published.'
+            exit 0
+          fi
+          rb drv publish outputs --registry "$REGISTRY" --namespace "$STORE"
+
+  # The index repository holds the online key and signs, so the key never
+  # reaches a repository that runs package builds
+  index:
+    name: Index
+    needs: publish
+    if: ${{ !cancelled() && needs.publish.result == 'success' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: rootbeer-org/setup-rb@bf50460fdf9e1b17508117150b26b624b840d08c
+      - name: Write an index entry for each published package
+        run: rb drv index "$RUNNER_TEMP/entries" --registry "$REGISTRY" --namespace "$STORE"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: rb-index-entries
+          path: ${{ runner.temp }}/entries
+          retention-days: 7
+          if-no-files-found: error
+      - name: Mint a token to dispatch the index's signing
+        id: app
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1
+        with:
+          client-id: ${{ vars.ROOTBEER_BOT_CLIENT_ID }}
+          private-key: ${{ secrets.ROOTBEER_BOT_PRIVATE_KEY }}
+          owner: rootbeer-org
+          repositories: index
+          permission-actions: write
+      - name: Ask the index repository to sign them
+        env:
+          GH_TOKEN: ${{ steps.app.outputs.token }}
+        run: gh workflow run sign.yml --repo rootbeer-org/index --field run-id="$GITHUB_RUN_ID"

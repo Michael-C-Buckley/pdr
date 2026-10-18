@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# Runs rb as root in the pinned Linux builder, which linux-v1 builds need.
+# bubblewrap needs to create namespaces and mount its own /proc. The image
+# can't contain its own hash, so the sandbox learns it from RB_HOST_SYSTEM.
+set -euo pipefail
+
+builder=$(dirname "$0")
+hash=$(sha256sum < "$builder/Dockerfile")
+hash=${hash%% *}
+store="$RUNNER_TEMP/rb-store"
+
+# CI publishes the image for each Dockerfile, so a job builds one only when
+# ghcr doesn't have it yet, such as for a pull request that changes it.
+image="ghcr.io/rootbeer-org/builder:$hash-$(uname -m)"
+if ! docker image inspect "$image" > /dev/null 2>&1 && ! docker pull --quiet "$image" > /dev/null; then
+    image=$(docker build --quiet "$builder")
+fi
+mkdir -p "$store"
+
+exec docker run --rm --init --network host \
+    --env "RB_HOST_SYSTEM=builder-sha256:$hash" \
+    --env RB_REGISTRY_USER --env RB_REGISTRY_TOKEN \
+    --security-opt seccomp=unconfined \
+    --security-opt apparmor=unconfined \
+    --security-opt systempaths=unconfined \
+    --volume "$store:/opt/rb" \
+    --volume "$(command -v rb):/usr/local/bin/rb:ro" \
+    --volume "$PWD:$PWD" \
+    --workdir "$PWD" \
+    "$image" rb "$@"

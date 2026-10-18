@@ -16,6 +16,9 @@ return {
     },
     build = {
         backend = "rust",
+        dependencies = {
+            { package = "rust", version = "1.98.1", kind = "build" },
+        },
         rust = {
             packages = { "rootbeer-cli", "rootbeer-forge", "rootbeer-store" },
             environment = {
@@ -46,14 +49,6 @@ return {
         },
     },
     versions = {
-        ["0.1.0-main+0159c58de5d4"] = {
-            digests = {
-                ["aarch64-linux"] = "8f22b4f989c35957ddf556913eeba004d57b4b18c8bcf11b7e4cbd3402cd22ad",
-                ["aarch64-macos"] = "8f22b4f989c35957ddf556913eeba004d57b4b18c8bcf11b7e4cbd3402cd22ad",
-                ["x86_64-linux"] = "8f22b4f989c35957ddf556913eeba004d57b4b18c8bcf11b7e4cbd3402cd22ad",
-            },
-            commit = "0159c58de5d4dfac86ca0e219e4d8679f831d8f6",
-        },
         ["0.1.0-main+10b2269fc2f6"] = {
             digests = {
                 ["aarch64-linux"] = "6a4ed57cd8b993082d287c4ee12f1a9a49dc970f3081bfac7ebbae3505f251f4",
@@ -79,6 +74,9 @@ return {
             },
             build = {
                 backend = "rust",
+                dependencies = {
+                    { package = "rust", version = "1.98.1", kind = "build" },
+                },
                 rust = {
                     packages = { "rootbeer-cli", "rootbeer-forge" },
                     environment = {
@@ -114,6 +112,9 @@ return {
             },
             build = {
                 backend = "rust",
+                dependencies = {
+                    { package = "rust", version = "1.98.1", kind = "build" },
+                },
                 rust = {
                     packages = { "rootbeer-cli", "rootbeer-forge" },
                     environment = {
@@ -165,6 +166,9 @@ return {
             },
             build = {
                 backend = "rust",
+                dependencies = {
+                    { package = "rust", version = "1.98.1", kind = "build" },
+                },
                 rust = {
                     packages = { "rootbeer-cli", "rootbeer-forge", "rootbeer-store" },
                     environment = {
@@ -183,14 +187,6 @@ return {
             },
             commit = "351ac8046b92be582ff92e1d6d6b89a266138201",
         },
-        ["0.1.0-main+376dcf8d5cc0"] = {
-            digests = {
-                ["aarch64-linux"] = "27d3e35ff17be14dc29f243d7809af0ba20f066271ecfcdc571d0074f0030d33",
-                ["aarch64-macos"] = "27d3e35ff17be14dc29f243d7809af0ba20f066271ecfcdc571d0074f0030d33",
-                ["x86_64-linux"] = "27d3e35ff17be14dc29f243d7809af0ba20f066271ecfcdc571d0074f0030d33",
-            },
-            commit = "376dcf8d5cc07d031a1973dfdc152d2187b7897e",
-        },
         ["0.1.0-main+486a952cf43a"] = {
             digests = {
                 ["aarch64-linux"] = "0f723179a1ef46e0c03cfff7a46087f8dcd0bbbde3db2e4cadf60a1268daab07",
@@ -208,6 +204,9 @@ return {
             },
             build = {
                 backend = "rust",
+                dependencies = {
+                    { package = "rust", version = "1.98.1", kind = "build" },
+                },
                 rust = {
                     packages = { "rootbeer-cli", "rootbeer-forge", "rootbeer-store" },
                     environment = {
@@ -234,6 +233,36 @@ return {
             },
             commit = "4fa02918d4e36694e625c60c582a2c588015b362",
         },
+        ["0.1.0-main+50ba587384e7"] = {
+            digests = {
+                ["aarch64-linux"] = "af7220f314fe1a7bed28038d6bc4bbe83da0d56275aa14f2c4743e992a2a8a8a",
+                ["aarch64-macos"] = "af7220f314fe1a7bed28038d6bc4bbe83da0d56275aa14f2c4743e992a2a8a8a",
+                ["x86_64-linux"] = "af7220f314fe1a7bed28038d6bc4bbe83da0d56275aa14f2c4743e992a2a8a8a",
+            },
+            commit = "50ba587384e72182b5a0b7c067defac59d504a75",
+            build = {
+                backend = "rust",
+                dependencies = {
+                    { package = "rust", version = "1.98.1", kind = "build" },
+                },
+                rust = {
+                    packages = { "rootbeer-cli", "rootbeer-helper" },
+                    environment = {
+                        RB_SERIAL = "20261012073206",
+                        RB_SOURCE_REVISION = "{commit}",
+                        ROOTBEER_PDR_PUBLIC_KEY = "028c5b185fb63ea61128a0bf6fb0decc8b700020561db08d82a998c7d0493bc0",
+                        ROOTBEER_PDR_URL = "https://pdr.rbpkg.com/v3/current.json",
+                    },
+                },
+            },
+            outputs = {
+                bins = { "rb", "rb-helper" },
+                checks = {
+                    { "rb", "--version" },
+                    { "rb", "--help" },
+                },
+            },
+        },
         ["0.1.0-main+54e26834aae0"] = {
             digests = {
                 ["aarch64-linux"] = "e8185a7c4b0623ca2023b87344ffeea30c33c21c3efc4cf2e61c3d46814da23a",
@@ -251,6 +280,9 @@ return {
             },
             build = {
                 backend = "rust",
+                dependencies = {
+                    { package = "rust", version = "1.98.1", kind = "build" },
+                },
                 rust = {
                     packages = { "rootbeer-cli", "rootbeer-forge", "rootbeer-store" },
                     environment = {
@@ -278,6 +310,9 @@ return {
             },
             build = {
                 backend = "rust",
+                dependencies = {
+                    { package = "rust", version = "1.98.1", kind = "build" },
+                },
                 rust = {
                     packages = { "rootbeer-cli", "rootbeer-forge", "rootbeer-store" },
                     environment = {
@@ -305,6 +340,9 @@ return {
             },
             build = {
                 backend = "rust",
+                dependencies = {
+                    { package = "rust", version = "1.98.1", kind = "build" },
+                },
                 rust = {
                     packages = { "rootbeer-cli", "rootbeer-forge", "rootbeer-store" },
                     environment = {
@@ -347,14 +385,6 @@ return {
             },
             commit = "5feb04139f85922ffa7db2231585706aebf2e48b",
         },
-        ["0.1.0-main+67f529a9d532"] = {
-            digests = {
-                ["aarch64-linux"] = "0bb474efc78d32aa38728bf2dbe4bb625d34de8b19defe0f5a1dbc899750d306",
-                ["aarch64-macos"] = "0bb474efc78d32aa38728bf2dbe4bb625d34de8b19defe0f5a1dbc899750d306",
-                ["x86_64-linux"] = "0bb474efc78d32aa38728bf2dbe4bb625d34de8b19defe0f5a1dbc899750d306",
-            },
-            commit = "67f529a9d5323ed115035724faa3fb1836435040",
-        },
         ["0.1.0-main+6a14f4aaaa6d"] = {
             digests = {
                 ["aarch64-linux"] = "54a67ca0acdda5e01feee5fd39e9ae9f3e817d3deadc041678dc22d9cbc3094f",
@@ -362,14 +392,6 @@ return {
                 ["x86_64-linux"] = "54a67ca0acdda5e01feee5fd39e9ae9f3e817d3deadc041678dc22d9cbc3094f",
             },
             commit = "6a14f4aaaa6de6e8aad9eea1f1a456e3fb58a467",
-        },
-        ["0.1.0-main+74bb4473b039"] = {
-            digests = {
-                ["aarch64-linux"] = "d0a480f60c37db4db673f4cec54a51eb6da530f62e77485ddbefa1f29655a755",
-                ["aarch64-macos"] = "d0a480f60c37db4db673f4cec54a51eb6da530f62e77485ddbefa1f29655a755",
-                ["x86_64-linux"] = "d0a480f60c37db4db673f4cec54a51eb6da530f62e77485ddbefa1f29655a755",
-            },
-            commit = "74bb4473b039774d81d31feaa8ccb422ba4ecf65",
         },
         ["0.1.0-main+797f05c93da3"] = {
             digests = {
@@ -412,6 +434,9 @@ return {
             },
             build = {
                 backend = "rust",
+                dependencies = {
+                    { package = "rust", version = "1.98.1", kind = "build" },
+                },
                 rust = {
                     packages = { "rootbeer-cli", "rootbeer-forge", "rootbeer-store" },
                     environment = {
@@ -430,6 +455,36 @@ return {
             },
             commit = "a33533f159d77f59e59c2844f8bcd3708cb1e41d",
         },
+        ["0.1.0-main+ac3d721a852a"] = {
+            digests = {
+                ["aarch64-linux"] = "1c56e5cdb272d899dadaff881e61d1751027ea530612eeaa11fd532b49b37786",
+                ["aarch64-macos"] = "1c56e5cdb272d899dadaff881e61d1751027ea530612eeaa11fd532b49b37786",
+                ["x86_64-linux"] = "1c56e5cdb272d899dadaff881e61d1751027ea530612eeaa11fd532b49b37786",
+            },
+            commit = "ac3d721a852a107ad472d8d2b2bc8ab16c1baf2a",
+            build = {
+                backend = "rust",
+                dependencies = {
+                    { package = "rust", version = "1.98.1", kind = "build" },
+                },
+                rust = {
+                    packages = { "rootbeer-cli", "rootbeer-helper", "rootbeer-store-legacy" },
+                    environment = {
+                        RB_SERIAL = "20261012213941",
+                        RB_SOURCE_REVISION = "{commit}",
+                        ROOTBEER_PDR_PUBLIC_KEY = "028c5b185fb63ea61128a0bf6fb0decc8b700020561db08d82a998c7d0493bc0",
+                        ROOTBEER_PDR_URL = "https://pdr.rbpkg.com/v3/current.json",
+                    },
+                },
+            },
+            outputs = {
+                bins = { "rb", "rb-helper", "rb-store" },
+                checks = {
+                    { "rb", "--version" },
+                    { "rb", "--help" },
+                },
+            },
+        },
         ["0.1.0-main+b8f0a99c0e4b"] = {
             digests = {
                 ["aarch64-linux"] = "11432e9f6528b0cfa7295e8ee1c7cf1070d80bfa09d6344ce11727a949ac2bf1",
@@ -446,14 +501,6 @@ return {
             },
             commit = "c3691e08679f7674915971f77b12478870f2366e",
         },
-        ["0.1.0-main+c41cc8669a68"] = {
-            digests = {
-                ["aarch64-linux"] = "92283b4e9d495432af840cd12a7ebbd9989178627ab233fcf49727a0fd9ad54a",
-                ["aarch64-macos"] = "92283b4e9d495432af840cd12a7ebbd9989178627ab233fcf49727a0fd9ad54a",
-                ["x86_64-linux"] = "92283b4e9d495432af840cd12a7ebbd9989178627ab233fcf49727a0fd9ad54a",
-            },
-            commit = "c41cc8669a687eb47a5266a3209ded4fa9bf2215",
-        },
         ["0.1.0-main+cba0dac696eb"] = {
             digests = {
                 ["aarch64-linux"] = "3bceec493cde2c6e69542210411ef95cad2e7670c8c2f75e03674a8b6c2dcc3c",
@@ -463,6 +510,9 @@ return {
             commit = "cba0dac696eba9568a7e98091424babcd6bf1f40",
             build = {
                 backend = "rust",
+                dependencies = {
+                    { package = "rust", version = "1.98.1", kind = "build" },
+                },
                 rust = {
                     packages = { "rootbeer-cli", "rootbeer-helper" },
                     environment = {
@@ -480,14 +530,6 @@ return {
                     { "rb", "--help" },
                 },
             },
-        },
-        ["0.1.0-main+d1ed59320079"] = {
-            digests = {
-                ["aarch64-linux"] = "b9fb06467bcba58d7419ebe814fda27245cf7c92dcd0490c244fc0542c640395",
-                ["aarch64-macos"] = "b9fb06467bcba58d7419ebe814fda27245cf7c92dcd0490c244fc0542c640395",
-                ["x86_64-linux"] = "b9fb06467bcba58d7419ebe814fda27245cf7c92dcd0490c244fc0542c640395",
-            },
-            commit = "d1ed59320079526bfed09f027376402a25a9338f",
         },
         ["0.1.0-main+e2d15a5f16c2"] = {
             digests = {
@@ -512,14 +554,6 @@ return {
                 ["x86_64-linux"] = "1ff539ad26ebde668e7f6bda56c4364ec9faaa38a572e50582fe8e9dcd13365d",
             },
             commit = "e4573683216168080ec531d108a35fd8b56670d7",
-        },
-        ["0.1.0-main+eee7bf74b917"] = {
-            digests = {
-                ["aarch64-linux"] = "8a5322d5adef8eb79f9042d2442ce3d7aaeedc2ca3b2d25b9a6bca55d530a492",
-                ["aarch64-macos"] = "8a5322d5adef8eb79f9042d2442ce3d7aaeedc2ca3b2d25b9a6bca55d530a492",
-                ["x86_64-linux"] = "8a5322d5adef8eb79f9042d2442ce3d7aaeedc2ca3b2d25b9a6bca55d530a492",
-            },
-            commit = "eee7bf74b9177e3068d012b549b8289d1e2e30c0",
         },
         ["0.1.0-main+f2012f0f4847"] = {
             digests = {

@@ -7,6 +7,9 @@ return {
     prebuilt = {
         url = "https://storage.googleapis.com/copilot-mac-releases/images/Copilot-6.4.4-332-80a7fa78.dmg",
         install = "Dmg",
+        dependencies = {
+            { package = "7zip", version = "26.04", kind = "build" },
+        },
         mirror = true,
     },
     outputs = {

@@ -28,8 +28,8 @@ return {
                 {
                     "sh",
                     "./configure",
-                    "--prefix=/",
-                    "--with-ssl={dependencies}",
+                    "--prefix={prefix}",
+                    "--with-ssl={dependencies.openssl}",
                     "--with-drill",
                     "--with-examples",
                     "--enable-shared",
@@ -51,7 +51,7 @@ return {
                 },
             },
             install = {
-                { "make", "DESTDIR={prefix}", "install" },
+                { "make", "install" },
             },
         },
     },

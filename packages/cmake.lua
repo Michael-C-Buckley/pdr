@@ -16,6 +16,8 @@ return {
     },
     build = {
         backend = "custom",
+        -- The debugger tests bind Unix sockets in the build directory.
+        allow = { "local-network" },
         dependencies = {
             {
                 package = "openssl",
@@ -28,13 +30,13 @@ return {
                 {
                     "/bin/sh",
                     "./bootstrap",
-                    "--prefix=/",
+                    "--prefix={prefix}",
                     "--parallel={jobs}",
                     "--",
                     "-DCMAKE_BUILD_TYPE=Release",
                     "-DBUILD_TESTING=ON",
                     "-DBUILD_CursesDialog=OFF",
-                    "-DOPENSSL_ROOT_DIR={dependencies}",
+                    "-DOPENSSL_ROOT_DIR={dependencies.openssl}",
                     "-DOPENSSL_USE_STATIC_LIBS=ON",
                 },
             },
@@ -53,7 +55,7 @@ return {
                 },
             },
             install = {
-                { "make", "DESTDIR={prefix}", "install" },
+                { "make", "install" },
             },
         },
     },
