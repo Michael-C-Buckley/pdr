@@ -69,13 +69,13 @@ return {
     },
     platforms = {
         ["aarch64-macos"] = {
-            default_version = "1.7.5",
+            default_version = "1.7.6",
         },
     },
     versions = {
-        ["1.7.5"] = {
+        ["1.7.6"] = {
             digests = {
-                ["aarch64-macos"] = "ebc2c6e09a2f2d95cdfc8f66c1e14b9a432fb75f3162f7420a8a1ecfbf6ade22",
+                ["aarch64-macos"] = "a5b8e4ec28e38232d5b9b149d824598fd561336e5456af39dfa21a75d707dfde",
             },
         },
     },
